@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Vuokra vai oma Oulussa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+</head><body>
+<style>
+/* Layout: two-column calculator — inputs left, results + 20-year chart right; stacks on phone */
+:root{
+  --bg:#f5f7f8; --surface:#ffffff; --fg:#1b2429; --muted:#5d6b73; --line:#dce3e7;
+  --rent:#1f7a74; --own:#b06a12; --accent:#2a5d78; --good:#2f7d3e; --bad:#a63b2e;
+  --display:"Newsreader", Georgia, serif;
+  --body:"IBM Plex Sans", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12181c; --surface:#1a2227; --fg:#e4eaed; --muted:#93a2aa; --line:#2b363d;
+  --rent:#4fbdb4; --own:#e5a24b; --accent:#7fb3d1; --good:#6cc27c; --bad:#e8806f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12181c; --surface:#1a2227; --fg:#e4eaed; --muted:#93a2aa; --line:#2b363d;
+  --rent:#4fbdb4; --own:#e5a24b; --accent:#7fb3d1; --good:#6cc27c; --bad:#e8806f; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1{font-family:var(--display);font-weight:600;font-size:2rem;line-height:1.15;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:500;font-size:1.2rem;margin:0}
+.lede{color:var(--muted);max-width:65ch;margin:6px 0 0}
+.grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+legend{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:6px}
+.row{display:grid;grid-template-columns:1fr 112px;gap:10px;align-items:center}
+.row label{font-size:.9rem}
+.row small{display:block;color:var(--muted);font-size:.75rem;line-height:1.3}
+input[type=number]{width:100%;box-sizing:border-box;font:500 .95rem var(--mono);font-variant-numeric:tabular-nums;
+  padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);text-align:right}
+input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:.88rem}
+.check input{margin-top:3px;accent-color:var(--accent)}
+hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.kpis{grid-template-columns:minmax(0,1fr)}}
+.kpi{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:8px;background:var(--bg)}
+.kpi .lab{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.kpi .val{font:500 1.55rem var(--mono);font-variant-numeric:tabular-nums}
+.kpi .sub{font-size:.8rem;color:var(--muted)}
+.verdict{font-size:.95rem;padding:10px 14px;border-left:3px solid var(--accent);background:var(--bg);border-radius:0 6px 6px 0}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{padding:7px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+td.num{font-family:var(--mono)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:.85rem}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{width:14px;height:3px;border-radius:2px;display:inline-block}
+.chart-wrap{overflow-x:auto}
+svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+.note{font-size:.8rem;color:var(--muted);max-width:75ch;margin:0}
+.ref{display:flex;flex-direction:column;gap:6px;font-size:.85rem}
+.ref b{font-weight:600}
+.explain{gap:22px}
+.explain .intro{max-width:70ch;margin:0;color:var(--muted)}
+.terms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 32px}
+@media (max-width:820px){.terms{grid-template-columns:minmax(0,1fr)}}
+.term{display:flex;flex-direction:column;gap:6px;min-width:0}
+.term h3{font-family:var(--display);font-weight:600;font-size:1.05rem;margin:0;padding-top:12px;border-top:1px solid var(--line)}
+.term p,.term ul{margin:0;max-width:65ch}
+.term ul{padding-left:1.1em;display:flex;flex-direction:column;gap:3px}
+.term .ex{font-size:.88rem;background:var(--bg);border-radius:6px;padding:8px 10px}
+.term .ex b{font-weight:600}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Vuokra vai oma Oulussa</h1>
+    <p class="lede">Muuta oletuksia vasemmalla. Laskuri vertaa kahta vaihtoehtoa: myyt talon ja asut vuokralla sijoittaen 200 000 €, tai ostat velattoman 180 000 € asunnon ja sijoitat loput.</p>
+  </header>
+
+  <div class="grid">
+    <form class="panel" id="f" autocomplete="off">
+      <fieldset>
+        <legend>Pääoma</legend>
+        <div class="row"><label for="cap">Myynnistä jäävä summa €</label><input id="cap" type="number" step="5000" value="200000"></div>
+        <div class="row"><label for="price">Uuden asunnon hinta €</label><input id="price" type="number" step="5000" value="180000"></div>
+        <div class="row"><label for="buyc">Ostokulut €<small>varainsiirtovero 1,5 %, muutto ym.</small></label><input id="buyc" type="number" step="500" value="5000"></div>
+      </fieldset>
+      <hr>
+      <fieldset>
+        <legend>Sijoitukset</legend>
+        <div class="row"><label for="yld">Kestävä nostotaso %<small>osinkotuotto tai rahastonosto</small></label><input id="yld" type="number" step="0.1" value="4"></div>
+        <div class="row"><label for="tot">Kokonaistuotto %/v<small>osingot + arvonnousu, 20 v ennuste</small></label><input id="tot" type="number" step="0.1" value="6"></div>
+        <div class="row"><label for="tax">Vero tuotosta %<small>pörssiosinko ≈ 25,5 %</small></label><input id="tax" type="number" step="0.5" value="25.5"></div>
+        <label class="check"><input id="ost" type="checkbox"> Kaikki tuotto lykätyssä verotuksessa (osakesäästötili tai kasvurahasto)</label>
+      </fieldset>
+      <hr>
+      <fieldset>
+        <legend>Omistusasunto</legend>
+        <div class="row"><label for="m2">Pinta-ala m²</label><input id="m2" type="number" step="1" value="60"></div>
+        <div class="row"><label for="vast">Vastike €/m²/kk</label><input id="vast" type="number" step="0.1" value="4.5"></div>
+        <div class="row"><label for="rem">Remonttivaraus €/m²/v<small>putki-, julkisivu-, kylpyhuoneremontit</small></label><input id="rem" type="number" step="1" value="22"></div>
+        <div class="row"><label for="ins">Kotivakuutus €/v</label><input id="ins" type="number" step="10" value="200"></div>
+        <div class="row"><label for="hpg">Asunnon arvonnousu %/v</label><input id="hpg" type="number" step="0.5" value="1"></div>
+      </fieldset>
+      <hr>
+      <fieldset>
+        <legend>Vuokra-asunto</legend>
+        <div class="row"><label for="rent">Vuokra €/kk</label><input id="rent" type="number" step="10" value="850"></div>
+        <div class="row"><label for="rg">Vuokran nousu %/v</label><input id="rg" type="number" step="0.5" value="2"></div>
+        <div class="row"><label for="cg">Vastikkeen nousu %/v</label><input id="cg" type="number" step="0.5" value="2.5"></div>
+      </fieldset>
+      <hr>
+      <fieldset>
+        <legend>Palkasta asumiseen</legend>
+        <div class="row"><label for="bud">Asumisbudjetti €/kk<small>sama molemmissa; ylijäämä sijoitetaan, vaje otetaan salkusta</small></label><input id="bud" type="number" step="10" value="400"></div>
+        <div class="row"><label for="bg">Budjetin nousu %/v<small>esim. palkankorotukset</small></label><input id="bg" type="number" step="0.5" value="2"></div>
+      </fieldset>
+      <hr>
+      <fieldset>
+        <legend>Aika</legend>
+        <div class="row"><label for="yrs">Tarkasteluaika v</label><input id="yrs" type="number" step="1" min="1" max="40" value="20"></div>
+      </fieldset>
+    </form>
+
+    <div style="display:flex;flex-direction:column;gap:24px;min-width:0">
+      <section class="panel">
+        <h2>Ensimmäinen vuosi</h2>
+        <div class="kpis">
+          <div class="kpi"><span class="lab">Rajavuokra</span><span class="val" id="k-be">–</span><span class="sub">tällä vuokralla vaihtoehdot ovat tasoissa</span></div>
+          <div class="kpi"><span class="lab">Sijoitustulo netto, vuokra</span><span class="val" id="k-inA">–</span><span class="sub" id="k-inA2"></span></div>
+          <div class="kpi"><span class="lab">Asumiskulut, omistus</span><span class="val" id="k-cB">–</span><span class="sub" id="k-cB2"></span></div>
+        </div>
+        <p class="verdict" id="verdict"></p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Kuukaudessa, 1. vuosi</th><th>Asumiskulu</th><th>Palkasta</th><th>Salkusta (−) / salkkuun (+)</th><th>Salkun nettotuotto</th><th>Salkun muutos</th></tr></thead>
+            <tbody id="flowtb"></tbody>
+          </table>
+        </div>
+        <p class="note">Palkasta maksetaan asumisbudjetin verran. Jos asumiskulu on budjettia suurempi, loppu otetaan salkusta. Salkun muutos = nettotuotto ± tämä siirto. Jos muutos on alle noin 2 %/v, salkun ostovoima pienenee.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Nettovarallisuus vuosittain</h2>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--rent)"></i>Vuokralla + sijoitukset</span>
+          <span><i class="sw" style="background:var(--own)"></i>Omistusasunto + sijoitukset</span>
+        </div>
+        <div class="chart-wrap"><svg id="chart" viewBox="0 0 640 280" width="100%" role="img" aria-label="Varallisuuden kehitys"></svg></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Vuosi</th><th>Vuokra-asujan salkku</th><th>Omistajan salkku</th><th>Asunnon arvo</th><th>Ero (oma − vuokra)</th></tr></thead>
+            <tbody id="tb"></tbody>
+          </table>
+        </div>
+        <p class="note">Molemmat käyttävät palkastaan saman asumisbudjetin. Jos asumiskulut ovat budjettia pienemmät, erotus sijoitetaan salkkuun. Jos ne ovat suuremmat, erotus otetaan salkusta. Asunnon myyntikuluja ei ole vähennetty. Luvut ovat nimellisiä euroja.</p>
+      </section>
+
+      <section class="panel ref">
+        <h2>Oulun vertailutasoja</h2>
+        <span><b>Vuokrat:</b> Oikotien ilmoituksissa Oulun kaksiot (45–66 m²) ovat syksyllä 2026 noin 600–900 €/kk. Uudet ja keskusta-asunnot ovat haarukan yläpäässä.</span>
+        <span><b>Hinnat:</b> Tilastokeskuksen ennakkotiedoissa vanhojen osakeasuntojen hinnat nousivat kesäkuussa 2026 suurista kaupungeista vain Oulussa (+3,3 % vuodessa). Koko maassa ne laskivat 3,9 %. Välittäjät pitävät nousua osin tilastollisena.</span>
+        <span><b>Neliöhinta:</b> myynnissä olevien asuntojen keskiarvo Oulussa on noin 2 700 €/m². 180 000 € riittää siis noin 65 m² asuntoon keskimääräisellä alueella.</span>
+      </section>
+    </div>
+  </div>
+
+  <section class="panel explain" id="selitykset">
+    <h2>Näin laskuri toimii</h2>
+    <p class="intro">Laskuri vertaa kahta vaihtoehtoa samoilla lähtörahoilla. Vaihtoehto 1: myyt talon, asut vuokralla ja sijoitat koko summan. Vaihtoehto 2: ostat velattoman asunnon ja sijoitat sen, mitä jää yli. Alla on selitetty jokainen syöttökenttä ja tulos.</p>
+    <div class="terms">
+
+      <div class="term">
+        <h3>Rajavuokra</h3>
+        <p>Vuokra, jolla vaihtoehdot ovat ensimmäisenä vuonna taloudellisesti tasoissa. Siihen kuuluu kaksi osaa:</p>
+        <ul>
+          <li>omistusasunnon kulut, jotka maksaisit joka tapauksessa palkastasi</li>
+          <li>vuokralaisen suuremman salkun ylimääräinen nettotuotto, jonka voi käyttää vuokraan ilman, että salkun ostovoima pienenee</li>
+        </ul>
+        <p class="ex"><b>Esimerkki 90 m²:</b> kulut 587 €/kk + salkun lisätuotto 459 €/kk = rajavuokra 1 046 €/kk. Palkasta lähtee molemmissa sama 587 €.</p>
+        <p>Rajavuokraa halvempi vuokra tarkoittaa, että vuokralla asuminen on edullisempaa. Kalliimpi vuokra on hinta, jonka maksat vuokra-asumisen vapaudesta.</p>
+      </div>
+
+      <div class="term">
+        <h3>Kestävä nostotaso %</h3>
+        <p>Kuinka suuren osan salkusta voi ottaa vuosittain käyttöön niin, että salkun ostovoima säilyy. Osinkosalkussa se on osinkotuotto, rahastossa vuosittain myytävä osuus.</p>
+        <p>Kun kokonaistuotto on 6 % ja inflaatio noin 2 %, 4 %:n nosto jättää salkkuun 2 % kasvua. Salkku pysyy silloin reaalisesti samankokoisena.</p>
+        <p class="ex"><b>4 % vs. 4,5 %:</b> 200 000 €:n salkusta saat noin 60 €/kk enemmän käteen, mutta salkun ostovoima pienenee noin 0,5 % vuodessa. 20 vuodessa se on noin 10 %.</p>
+        <p>Luku vaikuttaa rajavuokraan ja siihen, kuinka suuri osa tuotosta verotetaan vuosittain.</p>
+      </div>
+
+      <div class="term">
+        <h3>Kokonaistuotto %/v</h3>
+        <p>Salkun koko vuosituotto: osingot ja osakkeiden arvonnousu yhteensä. Tätä käytetään 20 vuoden ennusteessa.</p>
+        <p>Usein mainittu 10 % on Yhdysvaltain osakemarkkinan historiallinen tuotto ennen inflaatiota, kuluja ja veroja. Siitä noin 3 % on ollut inflaatiota. Tulevaisuuden tuotto-odotukset ovat tyypillisesti 6–8 %.</p>
+        <p class="ex"><b>Kokeile kolmea tasoa:</b> 5 % pessimistinen, 7 % realistinen, 9 % historiallinen. Mitä korkeampi tuotto, sitä enemmän vuokralla asuminen hyötyy, koska vuokralaisella on enemmän rahaa sijoitettuna.</p>
+      </div>
+
+      <div class="term">
+        <h3>Asumisbudjetti €/kk</h3>
+        <p>Summa, jonka maksat palkastasi asumiseen joka kuukausi. Se on sama molemmissa vaihtoehdoissa, jotta vertailu on reilu.</p>
+        <ul>
+          <li>Jos asumiskulu on budjettia pienempi, erotus sijoitetaan salkkuun.</li>
+          <li>Jos asumiskulu on budjettia suurempi, erotus otetaan salkusta.</li>
+        </ul>
+        <p class="ex"><b>Budjetti 400 €, vuokra 1 046 €:</b> vuokralainen ottaa salkusta 646 €/kk. Omistaja (kulut 587 €) ottaa salkusta 187 €/kk.</p>
+        <p>Kun budjetti on yhtä suuri kuin omistusasunnon kulut, ennuste vastaa rajavuokran logiikkaa. Isompi budjetti kasvattaa molempien salkkuja.</p>
+      </div>
+
+      <div class="term">
+        <h3>Salkun muutos kuukaudessa</h3>
+        <p>Kuukausitaulukko näyttää, kasvaako salkku vai pieneneekö se: salkun nettotuotto + salkkuun menevä raha − salkusta otettu raha.</p>
+        <p>Pelkkä positiivinen luku ei riitä. Jos salkku kasvaa alle inflaation (noin 2 %/v), sen ostovoima pienenee, vaikka euromäärä kasvaa. 200 000 €:n salkulla tämä raja on noin 330 €/kk.</p>
+      </div>
+
+      <div class="term">
+        <h3>Verotus</h3>
+        <p>Pörssiyhtiön osingosta 85 % on veronalaista pääomatuloa (30 %), joten efektiivinen vero on noin 25,5 %. Yli 30 000 €:n pääomatuloista vero on 34 %.</p>
+        <p>Laskuri verottaa vuosittain osinkoja vastaavan osan tuotosta. Arvonnousu verotetaan vasta, kun osakkeet myydään.</p>
+        <p><b>Lykätty verotus</b> (osakesäästötili tai kasvurahasto): tuotosta ei mene veroa vuosittain, joten salkku kasvaa nopeammin. Vero arvioidaan lopussa 30 %:ksi kertyneestä voitosta. Osakesäästötilille voi tallettaa enintään 100 000 €.</p>
+      </div>
+
+      <div class="term">
+        <h3>Omistusasunnon kulut</h3>
+        <ul>
+          <li><b>Vastike:</b> taloyhtiön hoitovastike. Oulussa tyypillisesti 4–5 €/m²/kk.</li>
+          <li><b>Remonttivaraus:</b> säästö tuleviin isoihin remontteihin, kuten putki-, julkisivu- ja kattoremonttiin. Putkiremontti maksaa noin 800–1 200 €/m² kerran 40–50 vuodessa, eli noin 20–25 €/m²/v.</li>
+          <li><b>Kotivakuutus:</b> omistajalla laajempi kuin vuokralaisella.</li>
+          <li><b>Ostokulut:</b> varainsiirtovero (1,5 % osakeasunnosta), muutto ja pienet hankinnat. Ne vähentävät omistajan sijoitettavaa summaa.</li>
+        </ul>
+        <p>Sähkö, vesi ja netti ovat suunnilleen samat molemmissa vaihtoehdoissa, joten ne on jätetty pois.</p>
+      </div>
+
+      <div class="term">
+        <h3>Arvonnousu ja kustannusten nousu</h3>
+        <ul>
+          <li><b>Asunnon arvonnousu:</b> omistajan varallisuus kasvaa asunnon arvon mukana. Oulun hinnat ovat polkeneet paikallaan, joten 0–2 % on realistinen haarukka. Jokainen +1 %/v vastaa 180 000 €:n asunnossa noin 1 800 €/v.</li>
+          <li><b>Vuokran nousu:</b> yleensä inflaation tahdissa, 2–3 %/v.</li>
+          <li><b>Vastikkeen nousu:</b> vastikkeet ovat nousseet viime vuosina inflaatiota nopeammin lämmityksen ja korkojen takia.</li>
+          <li><b>Budjetin nousu:</b> kuinka paljon asumiseen käyttämäsi summa kasvaa, esimerkiksi palkankorotusten myötä.</li>
+        </ul>
+      </div>
+
+      <div class="term">
+        <h3>Nettovarallisuus ja taulukko</h3>
+        <ul>
+          <li><b>Vuokralainen:</b> salkun arvo (lykätyssä verotuksessa verojen jälkeen).</li>
+          <li><b>Omistaja:</b> salkun arvo + asunnon arvo.</li>
+          <li><b>Ero:</b> positiivinen luku tarkoittaa, että omistaja on edellä. Negatiivinen tarkoittaa, että vuokralainen on edellä.</li>
+        </ul>
+        <p>Kaikki luvut ovat nimellisiä euroja. 20 vuoden päästä euro on ostovoimaltaan noin kolmanneksen pienempi kuin nyt.</p>
+      </div>
+
+      <div class="term">
+        <h3>Mitä laskuri ei huomioi</h3>
+        <ul>
+          <li><b>Kurssiheilunta:</b> salkun arvo voi pudota 30–40 % huonona vuonna. Jos joudut nostamaan rahaa silloin, salkku toipuu hitaammin. Laskuri olettaa tasaisen tuoton.</li>
+          <li><b>Keskittymisriski:</b> pelkät suomalaiset perusteollisuus-, kauppa- ja finanssiyhtiöt ovat riskialttiimpi salkku kuin maailmanlaajuinen indeksirahasto.</li>
+          <li><b>Remonttiyllätykset:</b> todellinen remontti voi osua heti tai vasta vuosikymmenten päästä.</li>
+          <li><b>Vuokrasuhteen epävarmuus:</b> vuokranantaja voi myydä asunnon tai korottaa vuokraa.</li>
+          <li><b>Myyntikulut:</b> asunnon myynnin välityspalkkio (noin 3–5 %) ei näy omistajan lopputuloksessa.</li>
+          <li><b>Verovapaus:</b> oman kodin myyntivoitto on verovapaa, kun asunnossa on asunut vähintään kaksi vuotta. Omistusasunnossa asumisen hyötyä ei myöskään veroteta.</li>
+        </ul>
+        <p>Laskuri antaa suunnan, ei ennustetta. Lopullinen päätös on myös arvokysymys: kuinka paljon olet valmis maksamaan vapaudesta ja huolettomuudesta.</p>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString('fi-FI')+' €';
+const fmtK=n=>(Math.round(n/1000)).toLocaleString('fi-FI')+' k€';
+const ids=['cap','price','buyc','yld','tot','tax','m2','vast','rem','ins','hpg','rent','rg','cg','bud','bg','yrs'];
+
+function read(){const v={};ids.forEach(i=>v[i]=parseFloat($(i).value)||0);v.ost=$('ost').checked;return v}
+
+function calc(v){
+  const t=v.tax/100, investB0=Math.max(0,v.cap-v.price-v.buyc);
+  const ownCost0=v.m2*v.vast*12+v.m2*v.rem+v.ins;
+  // year-1 steady-state
+  const inA=v.cap*v.yld/100*(1-t), inB=investB0*v.yld/100*(1-t);
+  const beYear=inA-inB+ownCost0;
+  // projection
+  const yrs=Math.max(1,Math.min(40,Math.round(v.yrs)));
+  const div=Math.min(v.yld,v.tot)/100, tot=v.tot/100;
+  const rNet=v.ost?tot:tot-div*t; // dividends taxed yearly unless deferred
+  let pA=v.cap,pB=investB0,home=v.price,rent=v.rent*12,own=ownCost0,bud=v.bud*12;
+  const rows=[{y:0,pA,pB,home,nA:pA,nB:pB+home}];
+  for(let y=1;y<=yrs;y++){
+    pA=pA*(1+rNet); pB=pB*(1+rNet);
+    // same salary budget in both: surplus invested, deficit withdrawn
+    pA+=bud-rent; pB+=bud-own;
+    home*=1+v.hpg/100; rent*=1+v.rg/100; own*=1+v.cg/100; bud*=1+v.bg/100;
+    // deferred tax: estimate tax due on unrealised gains when cashing out
+    const nA=v.ost?pA-Math.max(0,pA-v.cap)*0.30:pA;
+    const nB=(v.ost?pB-Math.max(0,pB-investB0)*0.30:pB)+home;
+    rows.push({y,pA,pB,home,nA,nB});
+  }
+  return {inA,inB,ownCost0,beYear,rows,investB0,rNet};
+}
+
+function chart(rows){
+  const W=640,H=280,L=58,R=16,T=14,B=30;
+  const vals=rows.flatMap(r=>[r.nA,r.nB]);
+  let lo=Math.min(0,...vals),hi=Math.max(...vals);
+  const step=niceStep((hi-lo)/5); lo=Math.floor(lo/step)*step; hi=Math.ceil(hi/step)*step;
+  const n=rows.length-1;
+  const x=i=>L+(W-L-R)*i/n, y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+  let s='';
+  for(let v=lo;v<=hi+1;v+=step){s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`+
+    `<text x="${L-8}" y="${y(v)+4}" text-anchor="end">${fmtK(v)}</text>`}
+  const xs=n<=10?1:n<=20?5:10;
+  for(let i=0;i<=n;i+=xs){s+=`<text x="${x(i)}" y="${H-10}" text-anchor="middle">${i} v</text>`}
+  const path=k=>rows.map((r,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(r[k]).toFixed(1)).join(' ');
+  s+=`<path d="${path('nA')}" fill="none" stroke="var(--rent)" stroke-width="2.5"/>`;
+  s+=`<path d="${path('nB')}" fill="none" stroke="var(--own)" stroke-width="2.5"/>`;
+  const e=rows[n];
+  s+=`<circle cx="${x(n)}" cy="${y(e.nA)}" r="4" fill="var(--rent)"/><circle cx="${x(n)}" cy="${y(e.nB)}" r="4" fill="var(--own)"/>`;
+  $('chart').innerHTML=s;
+}
+function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r||1)));const m=r/p;return (m<=1?1:m<=2?2:m<=5?5:10)*p}
+
+function render(){
+  const v=read(), c=calc(v);
+  $('k-be').textContent=fmt(c.beYear/12)+'/kk';
+  $('k-inA').textContent=fmt(c.inA)+'/v';
+  $('k-inA2').textContent='≈ '+fmt(c.inA/12)+'/kk ('+fmt(v.cap)+' × '+v.yld.toLocaleString('fi-FI')+' %)';
+  $('k-cB').textContent=fmt(c.ownCost0)+'/v';
+  $('k-cB2').textContent='≈ '+fmt(c.ownCost0/12)+'/kk, lisäksi sijoitustulo '+fmt(c.inB)+'/v';
+  const d=v.rent-c.beYear/12, last=c.rows[c.rows.length-1], gap=last.nB-last.nA;
+  $('verdict').innerHTML=(d<=0
+    ? `Vuokra ${fmt(v.rent)}/kk on <b style="color:var(--good)">${fmt(-d)}/kk alle rajavuokran</b>. Ensimmäisenä vuonna vuokralla asuminen on halvempaa.`
+    : `Vuokra ${fmt(v.rent)}/kk on <b style="color:var(--bad)">${fmt(d)}/kk yli rajavuokran</b>. Se on vuotuisena hintana ${fmt(d*12)} vapaudesta.`)
+    + ` ${last.y} vuoden kuluttua omistaja on ${gap>=0?'edellä':'jäljessä'} ${fmt(Math.abs(gap))}.`
+    ;
+  const fr=(name,cost,start)=>{const pal=Math.min(v.bud,cost)+Math.max(0,v.bud-cost)*0,tr=v.bud-cost,ret=start*c.rNet/12,ch=ret+tr;
+    const sg=x=>(x>=0?'+':'−')+fmt(Math.abs(x));
+    return `<tr><td>${name}</td><td class="num">${fmt(cost)}</td><td class="num">${fmt(v.bud)}</td><td class="num" style="color:${tr>=0?'var(--good)':'var(--bad)'}">${sg(tr)}</td><td class="num">${fmt(ret)}</td><td class="num" style="color:${ch>=0?'var(--good)':'var(--bad)'}">${sg(ch)}</td></tr>`};
+  $('flowtb').innerHTML=fr('Vuokralainen',v.rent,v.cap)+fr('Omistaja',c.ownCost0/12,c.investB0);
+  chart(c.rows);
+  const n=c.rows.length-1, pick=c.rows.filter(r=>r.y===0||r.y===n||r.y%5===0);
+  $('tb').innerHTML=pick.map(r=>`<tr><td>${r.y}</td><td class="num">${fmt(r.pA)}</td><td class="num">${fmt(r.pB)}</td><td class="num">${fmt(r.home)}</td><td class="num" style="color:${r.nB-r.nA>=0?'var(--own)':'var(--rent)'}">${(r.nB-r.nA>=0?'+':'−')+fmt(Math.abs(r.nB-r.nA))}</td></tr>`).join('');
+}
+$('f').addEventListener('input',render);
+$('f').addEventListener('submit',e=>e.preventDefault());
+render();
+</script>
+
+</html>
