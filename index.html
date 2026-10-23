@@ -65,6 +65,17 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
 .note{font-size:.8rem;color:var(--muted);max-width:75ch;margin:0}
 .ref{display:flex;flex-direction:column;gap:6px;font-size:.85rem}
 .ref b{font-weight:600}
+.mbar{display:none}
+@media (max-width:820px){
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;gap:6px 14px;flex-wrap:wrap;align-items:baseline;justify-content:space-between;
+    background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 14px rgba(0,0,0,.08);
+    padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+    padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .mbar .lab{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+  .mbar .val{font:500 1.25rem var(--mono);font-variant-numeric:tabular-nums;margin-left:8px}
+  .mbar .d{font-size:.85rem}
+  body{padding-block-end:110px}
+}
 .explain{gap:22px}
 .explain .intro{max-width:70ch;margin:0;color:var(--muted)}
 .terms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 32px}
@@ -80,7 +91,7 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
 <div class="wrap">
   <header>
     <h1>Vuokra vai oma Oulussa</h1>
-    <p class="lede">Muuta oletuksia vasemmalla. Laskuri vertaa kahta vaihtoehtoa: myyt talon ja asut vuokralla sijoittaen 200 000 €, tai ostat velattoman 180 000 € asunnon ja sijoitat loput.</p>
+    <p class="lede">Muuta oletuksia lomakkeessa. Tulokset päivittyvät heti, kun muutat lukua. Laskuri vertaa kahta vaihtoehtoa: myyt talon ja asut vuokralla sijoittaen 200 000 €, tai ostat velattoman 180 000 € asunnon ja sijoitat loput.</p>
   </header>
 
   <div class="grid">
@@ -274,6 +285,11 @@ svg text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
   </section>
 </div>
 
+<div class="mbar" aria-live="polite">
+  <span><span class="lab">Rajavuokra</span><span class="val" id="m-be">–</span></span>
+  <span class="d" id="m-d"></span>
+</div>
+
 <script>
 const $=id=>document.getElementById(id);
 const fmt=n=>Math.round(n).toLocaleString('fi-FI')+' €';
@@ -331,6 +347,9 @@ function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r||1)));const m=r
 function render(){
   const v=read(), c=calc(v);
   $('k-be').textContent=fmt(c.beYear/12)+'/kk';
+  $('m-be').textContent=fmt(c.beYear/12)+'/kk';
+  { const dm=v.rent-c.beYear/12;
+    $('m-d').innerHTML=dm<=0?`Vuokrasi <b style="color:var(--good)">${fmt(-dm)} alle</b>`:`Vuokrasi <b style="color:var(--bad)">${fmt(dm)} yli</b>`; }
   $('k-inA').textContent=fmt(c.inA)+'/v';
   $('k-inA2').textContent='≈ '+fmt(c.inA/12)+'/kk ('+fmt(v.cap)+' × '+v.yld.toLocaleString('fi-FI')+' %)';
   $('k-cB').textContent=fmt(c.ownCost0)+'/v';
